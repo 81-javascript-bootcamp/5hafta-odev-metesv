@@ -6,6 +6,7 @@ class PomodoroApp {
     this.$tableTbody = document.querySelector(tableTbodySelector);
     this.$taskForm = document.querySelector(taskFormSelector);
     this.$taskFormInput = this.$taskForm.querySelector('input');
+    this.$addBtnEl = document.querySelector('#add-btn');
   }
 
   getDeleteButtons() {
@@ -13,17 +14,25 @@ class PomodoroApp {
   }
 
   addTask(task) {
+    this.$addBtnEl.textContent = 'Adding...';
+    this.$addBtnEl.disabled = true;
+
     addTaskToApi(task)
       .then((data) => data.json())
       .then((newTask) => {
         this.addTaskToTable(newTask);
-      });
+      })
+      .then(() => this.handleDeleteTask());
+
+    this.$addBtnEl.textContent = 'Add Task';
+    this.$addBtnEl.disabled = false;
   }
 
-  addTaskToTable(task, index) {
+  addTaskToTable(task) {
+    const { id, title } = task;
     const $newTaskEl = document.createElement('tr');
-    $newTaskEl.innerHTML = `<th scope="row">${task.id}</th><td>${task.title}</td>
-    <td><button id=${task.id} class="trash-icon"><i class="far fa-trash-alt"></i></button></td>`;
+    $newTaskEl.innerHTML = `<th scope="row">${id}</th><td>${title}</td>
+    <td><button id=${id} class="trash-icon"><i class="far fa-trash-alt"></i></button></td>`;
     this.$tableTbody.appendChild($newTaskEl);
     this.$taskFormInput.value = '';
   }
